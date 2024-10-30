@@ -3,10 +3,9 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 
 def readData():
-    df = pd.read_csv('Customer_support_data.csv')
-
-    x = df.drop('CSAT Score', axis = 1)
-    y = df['CSAT Score']
+    df = pd.read_csv('Loan_Default.csv')
+    x = df.drop('dtir1', axis = 1)
+    y = df['dtir1']
     print("x shape: ", x.shape)
     print("data fields:", end=' ')
     oneHotEncoder = LabelEncoder()
@@ -15,3 +14,4 @@ def readData():
         print(i, end=', ')
     print(x)
     return x, y
+readData()
