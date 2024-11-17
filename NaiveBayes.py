@@ -1,53 +1,43 @@
 import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
 import readData
+import matplotlib.pyplot as plt
+from scipy.stats import pearsonr
+from sklearn.metrics import accuracy_score, classification_report
 
 
-class MultinomialNaiveBayes:
-    def __init__(self):
-        self.class_priors = {}
-        self.likelihoods = {}
-        self.classes = []
-        self.vocab_size = 0
+def draw(y_test, y_pred):
+    plt.figure(figsize=(8, 6))
 
-    def fit(self, X, y):
-        n_documents = X.shape[0]
-        self.classes = np.unique(y)
-        self.vocab_size = X.shape[1]
+    # Vẽ scatter plot giữa giá trị thực tế và dự đoán
+    plt.scatter(y_test, y_pred, color='blue', alpha=0.5)
 
-        # Tính xác suất tiên nghiệm cho từng lớp
-        for c in self.classes:
-            n_c = np.sum(y == c)  # Số tài liệu thuộc lớp c
-            self.class_priors[c] = n_c / n_documents
-            # Tính xác suất điều kiện cho từng đặc trưng
-            X_c = X[y == c]  # Tài liệu thuộc lớp c
-            word_counts = np.sum(X_c, axis=0) + 1  # Thêm 1 để tránh chia cho 0 (Laplace smoothing)
-            self.likelihoods[c] = word_counts / (np.sum(word_counts) + self.vocab_size)
+    # Vẽ đường chéo (giới hạn lý tưởng, nơi dự đoán = thực tế)
+    plt.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], color='red', linestyle='--')
 
-    def predict(self, X):
-        predictions = []
-        X = X.values
-        for x in X:
-            class_probabilities = np.zeros(len(self.classes))  # Mảng cho xác suất từng lớp
-            for idx, c in enumerate(self.classes):
-                prior = self.class_priors[c]
+    plt.xlabel('Giá trị thực tế (y_true)')
+    plt.ylabel('Giá trị dự đoán (y_pred)')
+    plt.title('Tương quan giữa Dự đoán và Thực tế')
 
-                likelihood = np.prod(self.likelihoods[c] ** x)  # Tính xác suất điều kiện cho lớp c
-                class_probabilities[idx] = prior * likelihood
-                print(x)
-            # Dự đoán lớp có xác suất cao nhất
-            predicted_class = self.classes[np.argmax(class_probabilities)]
-            predictions.append(predicted_class)
-        return np.array(predictions)
+    plt.show()
 
+
+def NaiveBayes(x , y):
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
+
+    model = GaussianNB()
+
+    model.fit(x_train, y_train)
+    y_pred = model.predict(x_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f'Accuracy: {accuracy:.2f}')
+    print("Classification Report:")
+    print(classification_report(y_test, y_pred))
+    draw(y_test, y_pred)
+    # đánh giá tương quan
+    corr, _ = pearsonr(y_test, y_pred)
+    print(f'Hệ số tương quan Pearson: {corr}')
 
 x, y = readData.readData()
-# x = (x - x.mean()) / x.std(ddof = 0)
-x_train = x[:1200]
-x_test = x[1200:2000]
-y_train = y[:1200]
-y_test = y[1200:2000]
-model = MultinomialNaiveBayes()
-model.fit(x_train, y_train)
-
-y_pred = model.predict(x_test)
-#print("Predictions:", y_pred)
+NaiveBayes(x, y)

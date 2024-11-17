@@ -4,17 +4,18 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 
 def readData():
     df = pd.read_csv('Loan_Default.csv')
-    x = df.drop('dtir1', axis = 1)
-    y = df['dtir1']
-    print("x shape: ", x.shape)
 
-    # print("data fields:", end=' ')
+    x = df.drop(['Status', 'ID', 'year'], axis=1)
+    x = x[:10000]
+    y = df['Status']
+    y = y[:10000]
+    #print(y.describe())
     oneHotEncoder = LabelEncoder()
     for i in x.columns:
-        x[i] = oneHotEncoder.fit_transform(x[i])
-        y = oneHotEncoder.fit_transform(y)
-        #print(i, end=', ')
-    x.fillna(x.mean(), inplace=True)
-    #print(x)
+        if not pd.api.types.is_numeric_dtype(x[i]):
+            x[i] = oneHotEncoder.fit_transform(x[i])
+    y = oneHotEncoder.fit_transform(y)
+    mean_values = df.select_dtypes(include=['number']).mean()
+    x = x.fillna(mean_values)
     return x, y
-readData()
+
