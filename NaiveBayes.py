@@ -7,7 +7,7 @@ from scipy.stats import pearsonr
 from sklearn.metrics import accuracy_score, classification_report
 
 
-def draw(y_test, y_pred):
+def draw_correlation_coefficient(y_test, y_pred):
     plt.figure(figsize=(8, 6))
 
     # Vẽ scatter plot giữa giá trị thực tế và dự đoán
@@ -34,10 +34,10 @@ def NaiveBayes(x , y):
     print(f'Accuracy: {accuracy:.2f}')
     print("Classification Report:")
     print(classification_report(y_test, y_pred))
-    draw(y_test, y_pred)
+    #draw_correlation_coefficient(y_test, y_pred)
     # đánh giá tương quan
-    corr, _ = pearsonr(y_test, y_pred)
+    corr = pearsonr(y_test, y_pred)
     print(f'Hệ số tương quan Pearson: {corr}')
-
-x, y = readData.readData()
-NaiveBayes(x, y)
+#
+# x, y = readData.readData()
+# NaiveBayes(x, y)
